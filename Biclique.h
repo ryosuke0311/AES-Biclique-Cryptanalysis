@@ -7,7 +7,7 @@
 #include <math.h>
 
 
-#define d 8.0 //Bicliqueの次元　8が最大で仕様通り　プログラムテストのために今は2に設定してある
+#define d 8.0 //Bicliqueの次元　8が最大で仕様通り
 #define SSize 16 //State S の配列のサイズ
 #define CSize 16 //Ciphertext C の配列のサイズ
 #define PSize 16 //Plaintext P の配列のサイズ
@@ -55,10 +55,13 @@ typedef struct Biclique{
     u_int8_t Delta_i[CSize];
     u_int8_t Nabra_j[SSize];
     u_int8_t subkey[KeySize*8];
+    u_int8_t candKey[KeySize];
+    u_int8_t cmp_P[PSize];
     u_int8_t Vi;
     u_int8_t Vj;
     SF f_state;
     SB b_state;
+    u_int8_t cmpflag;
 } BICL;
 
 
@@ -68,6 +71,7 @@ void conversion_C2P(BICL *Biclique,u_int8_t *secretKey);
 void precompute_P2v(BICL *Biclique);
 void precompute_S2v(BICL *Biclique);
 void recompute(BICL *Biclique);
+void fcompute(u_int8_t *C,u_int8_t *P,u_int8_t *key);
 
 
 #endif

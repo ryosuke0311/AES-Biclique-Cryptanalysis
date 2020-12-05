@@ -95,31 +95,40 @@ void conversion_C2P(BICL *Biclique,u_int8_t *secretKey){
 }
 
 void precompute_P2v(BICL *Biclique){ //P->vの事前計算をする
-    int i;
+    int i,c;
     printf("precompare_P2v start\n");
     for(i = 0;i < Number_of_i;i++){
         KeyExpantion4(Biclique[i].BicliqueKey,Biclique[i].subkey);
+        for(c = 0;c < KeySize;c++){
+            Biclique[i].candKey[c] = Biclique[i].subkey[112+c];
+        }
         PEnc(Biclique[i].P,&Biclique[i].f_state,Biclique[i].subkey);
         Biclique[i].Vi = Biclique[i].f_state.state5[0];
     }
 }
 
 void precompute_S2v(BICL *Biclique){ //S->vの事前計算をする
-    int j;
+    int j,c;
     printf("precompare_S2v start\n");
     for(j = 0;j < Number_of_j;j++){
         KeyExpantion4(Biclique[j*Number_of_j].BicliqueKey,Biclique[j*Number_of_j].subkey);
+        for(c = 0;c < KeySize;c++){
+            Biclique[j*Number_of_j].candKey[c] = Biclique[j*Number_of_j].subkey[112+c];
+        }
         Pinv_f(Biclique[j*Number_of_j].S,&Biclique[j*Number_of_j].b_state,Biclique[j*Number_of_j].subkey);
         Biclique[j*Number_of_j].Vj = Biclique[j*Number_of_j].b_state.state5[0];
     }
 }
 
 void recompute(BICL *Biclique){
-    int i,j;
+    int i,j,c;
 
     for(i = 1;i < Number_of_i;i++){
         for(j = 1;j < Number_of_j;j++){
             KeyRecompute(Biclique[0].subkey,Biclique[i].subkey,Biclique[j*Number_of_j].subkey,Biclique[i+j*Number_of_j].subkey);
+            for(c = 0;c < KeySize;c++){
+                Biclique[i+j*Number_of_j].candKey[c] = Biclique[i+j*Number_of_j].subkey[112+c];
+            }
         }
     }
 
@@ -143,4 +152,9 @@ void recompute(BICL *Biclique){
         }
     }
 
+}
+
+void fcompute(u_int8_t *C,u_int8_t *P,u_int8_t *key){
+    KeyExpantion(key);
+    Dec(C,P,10,0);
 }

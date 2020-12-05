@@ -13,9 +13,8 @@ int main(int argc,char *argv[]){
     int flag = 0;
     int count = 0;
     int seed;
-    /*Biclique.hでd = 2,本ソースの30行目でseed = 19にした時のK[3][1]をinv key expandしたり再計算したときのラウンド鍵0とsecretkeyを一緒にしてある*/
-    /*ソースを弄らずにmake test10とするとseedのスタートが10で26行目のforとか32行目のところあたりでseedが19で終わる*/
-    u_int8_t secretKey[KeySize] = {0xb2,0x71,0x32,0xcc,0x94,0x1d,0x69,0xb5,0x14,0x21,0xd6,0x3e,0x5d,0xd6,0x1a,0xa1};
+    
+    u_int8_t secretKey[KeySize] = {0xf7,0x60,0xd5,0xa,0x65,0xab,0x4d,0x9d,0x9e,0x66,0xb,0x8c,0x81,0x64,0xe7,0x95};
     BICL *Biclique;
 
     Biclique = (BICL *)malloc(sizeof(BICL) * Number_of_struct);
@@ -131,19 +130,37 @@ int main(int argc,char *argv[]){
                 printf("Vj is : %x\n",Biclique[i].Vj);
                 printf("--------------------------------------------------------------------\n");
                 count++;
-                flag = 1;
+                Biclique[i].cmpflag = 1;
             } else{
 
             }
             //printf("Vi is : %x\t",Biclique[i].Vi);
             //printf("Vj is : %x\n",Biclique[i].Vj);
         }
+
+        for(i = 0;i < Number_of_struct;i++){
+            if(Biclique[i].cmpflag){
+                fcompute(Biclique[i].C,Biclique[i].cmp_P,Biclique[i].candKey);
+                if(!memcmp(Biclique[i].P,Biclique[i].cmp_P,PSize)){
+                    printf("secret key is:");
+                    printf("K[%d][%d]\n",i%Number_of_i,i/Number_of_j);
+                    for(k = 0;k < KeySize - 1;k++){
+                        printf("%x,",Biclique[i].candKey[k]);
+                    }
+                    printf("%x\n",Biclique[i].candKey[k]);
+                    flag = 1;
+                }
+            }
+        }
+
         if(!flag){
             printf("There's no secret key in here\n");
+        } else{
+            exit(0);
         }
         printf("count is %d\n",count);
-        flag = 0;
         count = 0;
+
     }
     free(Biclique);
 }
